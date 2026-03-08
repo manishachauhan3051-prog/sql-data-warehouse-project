@@ -1,0 +1,87 @@
+# /*
+===============================================================================
+# Create Schemas for Data Warehouse Layers
+===============================================================================
+Script Purpose:
+This script creates three schemas (users) named 'BRONZE', 'SILVER', and 'GOLD'
+in the Oracle database. These schemas represent the different layers of a
+data warehouse architecture:
+- BRONZE : Raw source data layer
+- SILVER : Cleaned and transformed data layer
+- GOLD   : Business-ready reporting layer
+
+WARNING:
+     If schemas with the same names already exist, they may need to be dropped before running this script. 
+     Dropping a schema using "DROP USER <schema> CASCADE will permanently delete all objects within that schema, including tables,
+    views, indexes, procedures, and data.
+
+```
+Proceed with caution and ensure that any important data is backed up
+before executing this script.
+```
+*/
+
+
+Connect as SYSTEM
+
+Open SQL Developer → New Connection
+
+Use:
+
+Username: system
+
+Password: your password
+
+Role: default
+
+Connect.
+
+Only SYSTEM/SYS can create schemas.
+
+-- =============================================================
+-- Drop users if they already exist
+-- =============================================================
+
+BEGIN
+   EXECUTE IMMEDIATE 'DROP USER bronze CASCADE';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -1918 THEN RAISE; END IF;
+END;
+/
+
+BEGIN
+   EXECUTE IMMEDIATE 'DROP USER silver CASCADE';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -1918 THEN RAISE; END IF;
+END;
+/
+
+BEGIN
+   EXECUTE IMMEDIATE 'DROP USER gold CASCADE';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -1918 THEN RAISE; END IF;
+END;
+/
+
+-- =============================================================
+-- Create Bronze, Silver, Gold Schemas (Users)
+-- =============================================================
+
+CREATE USER bronze IDENTIFIED BY bronze123;
+CREATE USER silver IDENTIFIED BY silver123;
+CREATE USER gold IDENTIFIED BY gold123;
+
+-- =============================================================
+-- Grant permissions
+-- =============================================================
+
+GRANT CONNECT, RESOURCE TO bronze;
+GRANT CONNECT, RESOURCE TO silver;
+GRANT CONNECT, RESOURCE TO gold;
+
+ALTER USER bronze QUOTA UNLIMITED ON USERS;
+ALTER USER silver QUOTA UNLIMITED ON USERS;
+ALTER USER gold QUOTA UNLIMITED ON USERS;
